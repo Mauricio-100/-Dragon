@@ -5,6 +5,8 @@ const axios = require('axios');
 const program = new Command();
 
 // Définir l'URL de notre Registre
+
+// LIGNE CORRIGÉE
 const REGISTRY_URL = 'http://127.0.0.1:3000';
 
 program
