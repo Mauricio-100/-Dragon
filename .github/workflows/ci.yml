@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: package-lock.json # On ajoute cette ligne       # On met en cache les dépendances pour accélérer les futurs builds
+          cache-dependency-path: '**/package-lock.json' # On ajoute cette ligne       # On met en cache les dépendances pour accélérer les futurs builds
 
       # Étape 3 : Installer les dépendances de la racine et des sous-projets
       - name: Install dependencies
