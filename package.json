@@ -2,10 +2,10 @@
   "name": "-dragon",
   "version": "1.0.0",
   "description": "Command market",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "start": "node index.js",
+  "test": "echo \"No tests specified for registry\""
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mauricio-100/-Dragon.git"
