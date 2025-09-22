@@ -1,23 +1,17 @@
-# Nom de notre workflow, visible sur GitHub
 name: Dragon CI
 
-# Déclencheurs : quand ce workflow doit-il s'exécuter ?
 on:
   push:
-    branches: [ "main" ] # À chaque push sur la branche main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ] # À chaque demande de fusion vers main
+    branches: [ "main" ]
 
-# Jobs : la liste des tâches à accomplir
 jobs:
-  # Nous n'avons qu'un seul job pour l'instant, que nous appelons "build"
-  build:
-    # Le type de machine virtuelle sur laquelle exécuter le job
+  # Job 1 : Installation et build (ne change pas beaucoup)
+  install-and-build:
+    name: Install & Build
     runs-on: ubuntu-latest
-
-    # Les étapes (steps) qui composent le job
     steps:
-      # Étape 1 : Récupérer notre code depuis GitHub
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -26,20 +20,48 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json' # On ajoute cette ligne       # On met en cache les dépendances pour accélérer les futurs builds
+          cache-dependency-path: '**/package-lock.json'
 
-      # Étape 3 : Installer les dépendances de la racine et des sous-projets
-      - name: Install dependencies
+      - name: Install all dependencies
         run: |
-          npm install
           npm install --prefix packages/registry
-          # npm install --prefix packages/cli  # On laisse cette ligne commentée pour l'instant
+          npm install --prefix packages/cli
 
-      # Étape 4 (Optionnel) : Lancer une commande de vérification de base
-      # Plus tard, nous remplacerons ceci par de vrais tests (npm test)
-      - name: Build and Lint (Placeholder)
+  # Job 2 : Tests d'intégration (c'est la nouveauté !)
+  integration-tests:
+    name: Integration Tests
+    # Ce job ne commencera que si 'install-and-build' a réussi
+    needs: install-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      # On réinstalle les dépendances (c'est une nouvelle machine)
+      - name: Install all dependencies
         run: |
-          echo "Build step placeholder. Future tests will go here."
-          # Exemple de ce qu'on pourrait faire :
-          # npm run build --if-present
-          # npm run lint --if-present
+          npm install --prefix packages/registry
+          npm install --prefix packages/cli
+
+      # On installe notre commande 'drn' globalement
+      - name: Link CLI for testing
+        run: npm link --prefix packages/cli
+
+      # On lance notre serveur API en arrière-plan
+      - name: Start Dragon Registry in background
+        run: npm start --prefix packages/registry &
+
+      # On attend que le serveur soit prêt avant de continuer
+      - name: Wait for Registry to be ready
+        run: npx wait-on http://127.0.0.1:3000
+
+      # On lance le test !
+      - name: Run CLI ping test
+        run: npm test --prefix packages/cli
