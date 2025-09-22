@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Command market",
   "scripts": {
-  "start": "node index.js",
-  "test": "echo \"No tests specified for registry\""
-},
+    "start": "node index.js",
+    "test": "echo \"No tests specified for registry\""
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mauricio-100/-Dragon.git"
@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/Mauricio-100/-Dragon/issues"
   },
-  "homepage": "https://github.com/Mauricio-100/-Dragon#readme"
+  "homepage": "https://github.com/Mauricio-100/-Dragon#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "wait-on": "^9.0.1"
+  }
 }
